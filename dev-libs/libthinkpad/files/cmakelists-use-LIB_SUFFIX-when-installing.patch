@@ -1,0 +1,25 @@
+From 6ebd080baa37cedb85ef8663f7da5a73a9042abd Mon Sep 17 00:00:00 2001
+From: James Forcier <csssuf@csssuf.net>
+Date: Wed, 14 Feb 2018 22:26:50 -0800
+Subject: [PATCH] cmakelists: use LIB_SUFFIX when installing
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 825ccbd..7a016de 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,7 +32,7 @@ target_link_libraries(thinkpad ${THINKPAD_LINK})
+ set_target_properties(thinkpad PROPERTIES PUBLIC_HEADER "src/libthinkpad.h")
+ 
+ install(TARGETS thinkpad
+-        LIBRARY DESTINATION lib
++        LIBRARY DESTINATION lib${LIB_SUFFIX}
+         PUBLIC_HEADER DESTINATION include
+ )
+ 
+-- 
+2.13.6
+

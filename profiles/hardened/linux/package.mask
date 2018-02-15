@@ -1,0 +1,2 @@
+# systemd doesn't seem to work here
+dev-libs/libthinkpad
