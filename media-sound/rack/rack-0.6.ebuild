@@ -5,7 +5,7 @@ HOMEPAGE="https://vcvrack.com/"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64"
 
 NANOSVG_COMMIT="9a74da4db5ac74083e444010d75114658581b9c7"
 NANOVG_COMMIT="98e551351d020087b01ae0b1d3d2d1593e3ad01f"
@@ -52,7 +52,7 @@ src_unpack() {
 
 src_compile() {
 	emake dep
-	ARCH=lin TARGET=rack RELEASE=1 emake
+	BITS=64 ARCH=lin TARGET=rack RELEASE=1 emake
 }
 
 src_install() {
