@@ -31,7 +31,7 @@ src_compile() {
 }
 
 src_install() {
-	dodoc readme
+	dodoc README.md
 	if use doc; then
 		dodoc doc/release.txt
 		dohtml doc/html/*
