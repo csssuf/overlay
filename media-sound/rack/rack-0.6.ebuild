@@ -54,3 +54,8 @@ src_compile() {
 	emake dep
 	ARCH=lin TARGET=rack RELEASE=1 emake
 }
+
+src_install() {
+	dobin Rack
+	einstalldocs
+}
