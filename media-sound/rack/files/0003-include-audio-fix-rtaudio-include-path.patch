@@ -1,7 +1,7 @@
 From b12c1aa8a52558ac16c4543c0c1068b06b294b15 Mon Sep 17 00:00:00 2001
 From: James Forcier <csssuf@csssuf.net>
 Date: Thu, 26 Apr 2018 22:19:14 -0700
-Subject: [PATCH 3/3] include/audio: fix rtaudio include path
+Subject: [PATCH 3/4] include/audio: fix rtaudio include path
 
 ---
  include/audio.hpp | 2 +-
