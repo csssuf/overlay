@@ -26,7 +26,10 @@ DEPEND="
 	media-libs/glfw
 	media-libs/rtaudio
 	media-libs/rtmidi
-	media-libs/speexdsp
+	|| (
+		<media-libs/speex-1.2.0
+		media-libs/speexdsp
+	)
 	net-misc/curl
 	sys-libs/zlib"
 RDEPEND="${DEPEND}"
