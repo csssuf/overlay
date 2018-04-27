@@ -1,0 +1,25 @@
+From b12c1aa8a52558ac16c4543c0c1068b06b294b15 Mon Sep 17 00:00:00 2001
+From: James Forcier <csssuf@csssuf.net>
+Date: Thu, 26 Apr 2018 22:19:14 -0700
+Subject: [PATCH 3/3] include/audio: fix rtaudio include path
+
+---
+ include/audio.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/audio.hpp b/include/audio.hpp
+index 425fe90..4e36ce0 100644
+--- a/include/audio.hpp
++++ b/include/audio.hpp
+@@ -6,7 +6,7 @@
+ #ifndef __clang__
+ #pragma GCC diagnostic ignored "-Wsuggest-override"
+ #endif
+-#include <RtAudio.h>
++#include <rtaudio/RtAudio.h>
+ #pragma GCC diagnostic pop
+ 
+ 
+-- 
+2.17.0
+
