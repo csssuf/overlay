@@ -51,5 +51,5 @@ src_unpack() {
 
 src_compile() {
 	emake dep
-	TARGET=rack RELEASE=1 emake
+	ARCH=lin TARGET=rack RELEASE=1 emake
 }
