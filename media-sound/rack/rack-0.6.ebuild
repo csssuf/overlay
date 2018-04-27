@@ -24,7 +24,7 @@ DEPEND="
 	dev-libs/openssl
 	media-libs/glew
 	media-libs/glfw
-	media-libs/rtaudio
+	>=media-libs/rtaudio-5.0.0
 	media-libs/rtmidi
 	|| (
 		<media-libs/speex-1.2.0
