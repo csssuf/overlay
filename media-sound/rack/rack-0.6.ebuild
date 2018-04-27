@@ -34,7 +34,8 @@ DEPEND="
 	sys-libs/zlib"
 RDEPEND="${DEPEND}"
 
-PATCHES="${FILESDIR}/0001-remove-system-provided-deps-for-packaging.patch"
+PATCHES="${FILESDIR}/0001-remove-system-provided-deps-for-packaging.patch
+	${FILESDIR}/0002-window-don-t-handle-pixel-scaling.patch"
 
 src_unpack() {
 	unpack ${A}
