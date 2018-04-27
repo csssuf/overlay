@@ -14,7 +14,7 @@ RESTRICT="mirror"
 LICENSE="Rt-Midi"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="+alsa doc +jack"
+IUSE="+alsa doc jack"
 RDEPEND="alsa? ( media-libs/alsa-lib )
 	jack? ( media-sound/jack-audio-connection-kit )"
 
