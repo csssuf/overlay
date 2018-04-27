@@ -29,19 +29,3 @@ src_configure() {
 src_compile() {
 	emake -j1 || die "make failed"
 }
-
-src_install() {
-	dodoc README.md
-	if use doc; then
-		dodoc doc/release.txt
-		dohtml doc/html/*
-	fi
-
-	dolib.so librtmidi.so.3.0.0
-	dosym "librtmidi.so.3.0.0" "/usr/$(get_libdir)/librtmidi.so"
-	dosym "librtmidi.so.3.0.0" "/usr/$(get_libdir)/librtmidi.so.1"
-	insinto /usr/$(get_libdir)/pkgconfig
-	doins librtmidi.pc
-	insinto /usr/include
-	doins RtMidi.h
-}
