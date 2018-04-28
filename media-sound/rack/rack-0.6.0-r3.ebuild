@@ -81,6 +81,7 @@ src_install() {
 
 	insinto /usr/share/vcvrack/plugins/Fundamental
 	doins plugins/Fundamental/plugin.so
+	doins -r plugins/Fundamental/res/
 
 	einstalldocs
 }
