@@ -69,8 +69,8 @@ src_prepare() {
 }
 
 src_compile() {
-	BITS=64 ARCH=lin TARGET=rack emake
-	BITS=64 ARCH=lin TARGET=plugin.so emake -C plugins/Fundamental
+	BITS=64 ARCH=lin TARGET=rack RELEASE=1 emake
+	BITS=64 ARCH=lin TARGET=plugin.so RELEASE=1 emake -C plugins/Fundamental
 }
 
 src_install() {
