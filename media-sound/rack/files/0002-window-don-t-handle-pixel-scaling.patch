@@ -1,7 +1,7 @@
 From 7d5274f456581acecabc6931717fe711c5d5e807 Mon Sep 17 00:00:00 2001
 From: James Forcier <csssuf@csssuf.net>
 Date: Thu, 26 Apr 2018 22:07:11 -0700
-Subject: [PATCH 2/4] window: don't handle pixel scaling
+Subject: [PATCH 2/5] window: don't handle pixel scaling
 
 glfwGetWindowContentScale is in the still-unreleased glfw 3.3, so we
 can't build with it.

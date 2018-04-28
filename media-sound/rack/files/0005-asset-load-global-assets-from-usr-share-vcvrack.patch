@@ -1,0 +1,33 @@
+From 229084009cff54ab9e1b38bd78e61f2422442c72 Mon Sep 17 00:00:00 2001
+From: James Forcier <csssuf@csssuf.net>
+Date: Fri, 27 Apr 2018 19:15:52 -0700
+Subject: [PATCH 5/5] asset: load global assets from /usr/share/vcvrack
+
+---
+ src/asset.cpp | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/src/asset.cpp b/src/asset.cpp
+index 13ee0e7..7402fc4 100644
+--- a/src/asset.cpp
++++ b/src/asset.cpp
+@@ -41,11 +41,14 @@ std::string assetGlobal(std::string filename) {
+ 	dir = ".";
+ #endif
+ #if ARCH_LIN
+-	// TODO For now, users should launch Rack from their terminal in the global directory
+-	dir = ".";
++	dir = "/usr/share/vcvrack";
+ #endif
+ #else // RELEASE
++#if ARCH_LIN
++	dir = "/usr/share/vcvrack/";
++#else
+ 	dir = ".";
++#endif
+ #endif // RELEASE
+ 	return dir + "/" + filename;
+ }
+-- 
+2.17.0
+
