@@ -1,0 +1,57 @@
+From 058ab457fdaecbfcb4ce31bd96f64a52479a93c5 Mon Sep 17 00:00:00 2001
+From: James Forcier <csssuf@csssuf.net>
+Date: Fri, 27 Apr 2018 19:35:38 -0700
+Subject: [PATCH] remove system dependencies from build process
+
+---
+ Makefile      | 19 +------------------
+ src/Delay.cpp |  2 +-
+ 2 files changed, 2 insertions(+), 19 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 84e670f..5b482f8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -2,25 +2,8 @@ RACK_DIR ?= ../..
+ SLUG = Fundamental
+ VERSION = 0.6.0
+ 
+-FLAGS += -Idep/include
+ SOURCES += $(wildcard src/*.cpp)
+ DISTRIBUTABLES += $(wildcard LICENSE*) res
+-
+-# Static libs
+-libsamplerate := dep/lib/libsamplerate.a
+-OBJECTS += $(libsamplerate)
+-
+-# Dependencies
+-$(shell mkdir -p dep)
+-DEP_LOCAL := dep
+-DEPS += $(libsamplerate)
+-
+-$(libsamplerate):
+-	cd dep && $(WGET) http://www.mega-nerd.com/SRC/libsamplerate-0.1.9.tar.gz
+-	cd dep && $(UNTAR) libsamplerate-0.1.9.tar.gz
+-	cd dep/libsamplerate-0.1.9 && $(CONFIGURE)
+-	cd dep/libsamplerate-0.1.9 && $(MAKE)
+-	cd dep/libsamplerate-0.1.9 && $(MAKE) install
+-
++LDFLAGS += -lsamplerate
+ 
+ include $(RACK_DIR)/plugin.mk
+diff --git a/src/Delay.cpp b/src/Delay.cpp
+index 13bceec..f2d2a06 100644
+--- a/src/Delay.cpp
++++ b/src/Delay.cpp
+@@ -2,7 +2,7 @@
+ #include "dsp/samplerate.hpp"
+ #include "dsp/ringbuffer.hpp"
+ #include "dsp/filter.hpp"
+-#include "samplerate.h"
++#include <samplerate.h>
+ 
+ 
+ #define HISTORY_SIZE (1<<21)
+-- 
+2.17.0
+

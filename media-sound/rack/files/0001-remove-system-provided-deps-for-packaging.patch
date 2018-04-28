@@ -1,19 +1,19 @@
-From 331d913ccf37e52b2dc636a591e87d8d5aa63c39 Mon Sep 17 00:00:00 2001
+From 84a851ce4d8a3ac67e98d1be4968a246aa4e2b58 Mon Sep 17 00:00:00 2001
 From: James Forcier <csssuf@csssuf.net>
 Date: Thu, 26 Apr 2018 21:32:50 -0700
-Subject: [PATCH 1/5] remove system-provided deps for packaging
+Subject: [PATCH 1/6] remove system-provided deps for packaging
 
 ---
- Makefile         |  26 +--------
- dep/Makefile     | 140 +----------------------------------------------
+ Makefile         |  27 ++++-------
+ dep/Makefile     | 122 +----------------------------------------------
  include/midi.hpp |   2 +-
- 3 files changed, 4 insertions(+), 164 deletions(-)
+ 3 files changed, 10 insertions(+), 141 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 272073a..f544e89 100644
+index 2b92336..b603fab 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -3,7 +3,7 @@ VERSION = 0.6.1
+@@ -3,7 +3,7 @@ VERSION = 0.6.0
  
  FLAGS += \
  	-Iinclude \
@@ -22,88 +22,81 @@ index 272073a..f544e89 100644
  
  ifdef RELEASE
  	FLAGS += -DRELEASE
-@@ -18,35 +18,13 @@ STRIP ?= strip
- SOURCES += dep/nanovg/src/nanovg.c
- SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
+@@ -27,25 +27,14 @@ ifeq ($(ARCH), lin)
+ 	TARGET := Rack
+ endif
  
 -ifeq ($(ARCH), mac)
 -	SOURCES += dep/osdialog/osdialog_mac.m
 -	CXXFLAGS += -stdlib=libc++
 -	LDFLAGS += -stdlib=libc++ -lpthread -ldl \
--		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework CoreAudio -framework CoreMIDI \
--		-Ldep/lib dep/lib/libglfw3.a dep/lib/libGLEW.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libzip.a dep/lib/libz.a dep/lib/librtaudio.a dep/lib/librtmidi.a dep/lib/libcrypto.a dep/lib/libssl.a dep/lib/libcurl.a
--	TARGET := Rack
+-		-framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo \
+-		-Ldep/lib -lGLEW -lglfw -ljansson -lspeexdsp -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl
++ifeq ($(ARCH), lin)
++	SOURCES += dep/osdialog/osdialog_gtk2.c
++	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
++	LDFLAGS += -rdynamic \
++		-lpthread -lGL -ldl -lX11 -lasound -ljack \
++		$(shell pkg-config --libs gtk+-2.0) \
++		-lglfw3 -lGLEW -ljansson -lspeexdsp -lzip -lz -lrtmidi -lrtaudio -lcurl -lssl -lcrypto
+ 	TARGET := Rack
 -	BUNDLE := dist/$(TARGET).app
 -endif
 -
 -ifeq ($(ARCH), win)
 -	SOURCES += dep/osdialog/osdialog_win.c
--	LDFLAGS += -static \
+-	LDFLAGS += -static-libgcc -static-libstdc++ -lpthread -lws2_32 \
 -		-Wl,--export-all-symbols,--out-implib,libRack.a -mwindows \
--		-Ldep/lib -lglew32 -lglfw3 -ljansson -lspeexdsp -lzip -lz -lcurl -lssl -lcrypto -lrtaudio -lrtmidi \
--		-lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser
+-		-lgdi32 -lopengl32 -lcomdlg32 -lole32 \
+-		-Ldep/lib -lglew32 -lglfw3dll -lcurl -lzip -lrtaudio -lrtmidi -lcrypto -lssl \
+-		-Wl,-Bstatic -ljansson -lspeexdsp
 -	TARGET := Rack.exe
 -	OBJECTS += Rack.res
--endif
--
- ifeq ($(ARCH), lin)
- 	SOURCES += dep/osdialog/osdialog_gtk2.c
- 	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
- 	LDFLAGS += -rdynamic \
- 		-lpthread -lGL -ldl -lX11 -lasound -ljack \
- 		$(shell pkg-config --libs gtk+-2.0) \
--		-Ldep/lib \
--		-Wl,-Bstatic -lglfw3 -lGLEW -ljansson -lspeexdsp -lzip -lz -lrtmidi -lrtaudio -lcurl -lssl -lcrypto \
--		-Wl,-Bdynamic
-+		-lglfw3 -lGLEW -ljansson -lspeexdsp -lzip -lz -lrtmidi -lrtaudio -lcurl -lssl -lcrypto
- 	TARGET := Rack
  endif
  
+ 
 diff --git a/dep/Makefile b/dep/Makefile
-index 68d04d9..04988b1 100755
+index 65d3fc2..8a5bd9b 100755
 --- a/dep/Makefile
 +++ b/dep/Makefile
-@@ -6,155 +6,17 @@ RACK_DIR ?= ..
+@@ -6,137 +6,17 @@ RACK_DIR ?= ..
  
  include $(RACK_DIR)/arch.mk
  
 -ifeq ($(ARCH), lin)
--	glew = lib/libGLEW.a
--	glfw = lib/libglfw3.a
--	jansson = lib/libjansson.a
--	libspeexdsp = lib/libspeexdsp.a
--	libcurl = lib/libcurl.a
--	libzip = lib/libzip.a
--	zlib = lib/libz.a
--	rtmidi = lib/librtmidi.a
--	rtaudio = lib/librtaudio.a
--	openssl = lib/libssl.a
+-	glew = lib/libGLEW.so
+-	glfw = lib/libglfw.so
+-	jansson = lib/libjansson.so
+-	libspeexdsp = lib/libspeexdsp.so
+-	libcurl = lib/libcurl.so
+-	libzip = lib/libzip.so
+-	rtmidi = lib/librtmidi.so
+-	rtaudio = lib/librtaudio.so
+-	openssl = lib/libssl.so
 -endif
 -
 -ifeq ($(ARCH), mac)
--	glew = lib/libGLEW.a
--	glfw = lib/libglfw3.a
--	jansson = lib/libjansson.a
--	libspeexdsp = lib/libspeexdsp.a
--	libcurl = lib/libcurl.a
--	libzip = lib/libzip.a
--	zlib = lib/libz.a
--	rtmidi = lib/librtmidi.a
--	rtaudio = lib/librtaudio.a
--	openssl = lib/libssl.a
+-	glew = lib/libGLEW.dylib
+-	glfw = lib/libglfw.dylib
+-	jansson = lib/libjansson.dylib
+-	libspeexdsp = lib/libspeexdsp.dylib
+-	libcurl = lib/libcurl.dylib
+-	libzip = lib/libzip.dylib
+-	rtmidi = lib/librtmidi.dylib
+-	rtaudio = lib/librtaudio.dylib
+-	openssl = lib/libssl.dylib
 -endif
 -
 -ifeq ($(ARCH), win)
--	glew = lib/libglew32.a
--	glfw = lib/libglfw3.a
--	jansson = lib/libjansson.a
--	libspeexdsp = lib/libspeexdsp.a
--	libcurl = lib/libcurl.a
--	libzip = lib/libzip.a
--	zlib = lib/libz.a
--	rtmidi = lib/librtmidi.a
--	rtaudio = lib/librtaudio.a
--	openssl = lib/libssl.a
+-	glew = bin/glew32.dll
+-	glfw = bin/glfw3.dll
+-	jansson = bin/libjansson-4.dll
+-	libspeexdsp = bin/libspeexdsp-1.dll
+-	libcurl = bin/libcurl-4.dll
+-	libzip = bin/libzip-5.dll
+-	rtmidi = bin/librtmidi-4.dll
+-	rtaudio = bin/librtaudio.dll
+-	openssl = bin/libssl-1_1-x64.dll
 -endif
 -
  nanovg = include/nanovg.h
@@ -119,93 +112,80 @@ index 68d04d9..04988b1 100755
  # Targets
  
 -$(glew):
--	$(WGET) "https://github.com/nigels-com/glew/releases/download/glew-2.1.0/glew-2.1.0.tgz"
+-	$(WGET) https://github.com/nigels-com/glew/releases/download/glew-2.1.0/glew-2.1.0.tgz
 -	$(UNTAR) glew-2.1.0.tgz
--	cd glew-2.1.0 && mkdir -p build
--	cd glew-2.1.0/build && $(CMAKE) -DCMAKE_INSTALL_LIBDIR=lib ./cmake
--	$(MAKE) -C glew-2.1.0/build
--	$(MAKE) -C glew-2.1.0/build install
+-	$(MAKE) -C glew-2.1.0 glew.lib
+-	# On Linux, default lib path is lib64, so change it back to lib.
+-	$(MAKE) -C glew-2.1.0 GLEW_DEST="$(realpath $(DEP_LOCAL))" LIBDIR="$(realpath $(DEP_LOCAL))/lib" install
 -
 -$(glfw):
 -	cd glfw && $(CMAKE) . \
+-		-DBUILD_SHARED_LIBS=ON \
 -		-DGLFW_COCOA_CHDIR_RESOURCES=OFF -DGLFW_COCOA_MENUBAR=ON -DGLFW_COCOA_RETINA_FRAMEBUFFER=ON
 -	$(MAKE) -C glfw
 -	$(MAKE) -C glfw install
 -
 -$(jansson):
--	$(WGET) "http://www.digip.org/jansson/releases/jansson-2.10.tar.gz"
+-	$(WGET) http://www.digip.org/jansson/releases/jansson-2.10.tar.gz
 -	$(UNTAR) jansson-2.10.tar.gz
 -	cd jansson-2.10 && $(CONFIGURE)
 -	$(MAKE) -C jansson-2.10
 -	$(MAKE) -C jansson-2.10 install
 -
 -$(libspeexdsp):
--	$(WGET) "https://vcvrack.com/downloads/dep/speexdsp-SpeexDSP-1.2rc3.tgz"
+-	$(WGET) https://vcvrack.com/downloads/dep/speexdsp-SpeexDSP-1.2rc3.tgz
 -	$(UNTAR) speexdsp-SpeexDSP-1.2rc3.tgz
 -	cd speexdsp-SpeexDSP-1.2rc3 && $(CONFIGURE)
 -	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3
 -	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3 install
 -
 -$(openssl):
--	$(WGET) "https://www.openssl.org/source/openssl-1.1.0h.tar.gz"
--	$(UNTAR) openssl-1.1.0h.tar.gz
--	# ./config ignores CFLAGS, so hack it in with CC
--	cd openssl-1.1.0h && CC="$(CC) $(CFLAGS)" ./config --prefix="$(realpath $(DEP_LOCAL))"
--	$(MAKE) -C openssl-1.1.0h
--	$(MAKE) -C openssl-1.1.0h install_sw
+-	$(WGET) https://www.openssl.org/source/openssl-1.1.0g.tar.gz
+-	$(UNTAR) openssl-1.1.0g.tar.gz
+-	cd openssl-1.1.0g && ./config --prefix="$(realpath $(DEP_LOCAL))"
+-	$(MAKE) -C openssl-1.1.0g
+-	$(MAKE) -C openssl-1.1.0g install_sw
 -
 -$(libcurl): $(openssl)
--	$(WGET) "https://curl.haxx.se/download/curl-7.59.0.tar.gz"
--	$(UNTAR) curl-7.59.0.tar.gz
--	cd curl-7.59.0 && $(CONFIGURE) \
+-	$(WGET) https://github.com/curl/curl/releases/download/curl-7_56_0/curl-7.56.0.tar.gz
+-	$(UNTAR) curl-7.56.0.tar.gz
+-	cd curl-7.56.0 && $(CONFIGURE) \
 -		--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual \
 -		--without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 \
 -		--without-ca-bundle --with-ca-fallback --with-ssl="$(realpath $(DEP_LOCAL))"
--	$(MAKE) -C curl-7.59.0
--	$(MAKE) -C curl-7.59.0 install
+-	$(MAKE) -C curl-7.56.0
+-	$(MAKE) -C curl-7.56.0 install
 -
--$(libzip): $(zlib)
--	$(WGET) "https://nih.at/libzip/libzip-1.2.0.tar.gz"
+-$(libzip):
+-	$(WGET) https://nih.at/libzip/libzip-1.2.0.tar.gz
 -	$(UNTAR) libzip-1.2.0.tar.gz
 -	cd libzip-1.2.0 && $(CONFIGURE)
 -	$(MAKE) -C libzip-1.2.0
 -	$(MAKE) -C libzip-1.2.0 install
 -
--$(zlib):
--	$(WGET) "https://www.zlib.net/zlib-1.2.11.tar.gz"
--	$(UNTAR) zlib-1.2.11.tar.gz
--ifeq ($(ARCH), win)
--	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc
--	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc BINARY_PATH="$(realpath $(DEP_LOCAL))/bin" INCLUDE_PATH="$(realpath $(DEP_LOCAL))/include" LIBRARY_PATH="$(realpath $(DEP_LOCAL))/lib" install
--else
--	cd zlib-1.2.11 && $(CONFIGURE)
--	$(MAKE) -C zlib-1.2.11
--	$(MAKE) -C zlib-1.2.11 install
--endif
--
 -$(rtmidi):
--	$(WGET) "https://vcvrack.com/downloads/dep/rtmidi.tgz"
+-	$(WGET) https://vcvrack.com/downloads/dep/rtmidi.tgz
 -	$(UNTAR) rtmidi.tgz
 -	cd rtmidi && $(CONFIGURE)
 -	$(MAKE) -C rtmidi
 -	$(MAKE) -C rtmidi install
 -
--ifeq ($(ARCH), mac)
+-ifeq ($(ARCH),mac)
 -RTAUDIO_FLAGS += -DAUDIO_OSX_CORE=ON
 -endif
--ifeq ($(ARCH), win)
+-ifeq ($(ARCH),win)
 -RTAUDIO_FLAGS += -DAUDIO_WINDOWS_DS=ON -DAUDIO_WINDOWS_WASAPI=ON -DAUDIO_WINDOWS_ASIO=ON
 -endif
--ifeq ($(ARCH), lin)
--RTAUDIO_FLAGS += -DAUDIO_LINUX_ALSA=ON -DAUDIO_UNIX_JACK=ON
+-ifeq ($(ARCH),lin)
+-RTAUDIO_FLAGS += -DAUDIO_LINUX_ALSA=ON
 -endif
 -
 -ifdef RTAUDIO_ALL_APIS
--ifeq ($(ARCH), mac)
+-ifeq ($(ARCH),mac)
 -RTAUDIO_FLAGS += -DAUDIO_UNIX_JACK=ON
 -endif
--ifeq ($(ARCH), lin)
--RTAUDIO_FLAGS += -DAUDIO_LINUX_PULSE=ON
+-ifeq ($(ARCH),lin)
+-RTAUDIO_FLAGS += -DAUDIO_LINUX_PULSE=ON -DAUDIO_UNIX_JACK=ON
 -endif
 -endif
 -
@@ -214,8 +194,6 @@ index 68d04d9..04988b1 100755
 -	cd rtaudio/build && $(CMAKE) $(RTAUDIO_FLAGS) ..
 -	$(MAKE) -C rtaudio/build
 -	$(MAKE) -C rtaudio/build install
--	# For some reason, it doesn't install the static library
--	cp rtaudio/build/librtaudio_static.a lib/librtaudio.a
 -
  $(nanovg):
  	cp nanovg/src/*.h include/

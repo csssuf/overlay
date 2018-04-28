@@ -1,7 +1,7 @@
-From 229084009cff54ab9e1b38bd78e61f2422442c72 Mon Sep 17 00:00:00 2001
+From 28d0b71e56c43d3e2dbd4f6b0c11d46795b00c8e Mon Sep 17 00:00:00 2001
 From: James Forcier <csssuf@csssuf.net>
 Date: Fri, 27 Apr 2018 19:15:52 -0700
-Subject: [PATCH 5/5] asset: load global assets from /usr/share/vcvrack
+Subject: [PATCH 5/6] asset: load global assets from /usr/share/vcvrack
 
 ---
  src/asset.cpp | 7 +++++--

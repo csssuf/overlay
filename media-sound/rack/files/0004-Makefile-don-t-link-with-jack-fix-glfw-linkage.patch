@@ -1,17 +1,17 @@
-From 8fb0407114a5f21eb754b77977f35b3f8128da14 Mon Sep 17 00:00:00 2001
+From 5f04eac8534d09686c6fd8bb3d5b21086dfc7c8a Mon Sep 17 00:00:00 2001
 From: James Forcier <csssuf@csssuf.net>
 Date: Thu, 26 Apr 2018 22:30:03 -0700
-Subject: [PATCH 4/5] Makefile: don't link with jack; fix glfw linkage
+Subject: [PATCH 4/6] Makefile: don't link with jack; fix glfw linkage
 
 ---
  Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index f544e89..3a94e0f 100644
+index b603fab..099f7d7 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -22,9 +22,9 @@ ifeq ($(ARCH), lin)
+@@ -31,9 +31,9 @@ ifeq ($(ARCH), lin)
  	SOURCES += dep/osdialog/osdialog_gtk2.c
  	CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
  	LDFLAGS += -rdynamic \

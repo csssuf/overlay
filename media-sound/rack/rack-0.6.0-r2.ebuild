@@ -1,5 +1,7 @@
 EAPI=6
 
+inherit eutils
+
 DESCRIPTION="Rack is the engine for the VCV open-source virtual modular synthesizer."
 HOMEPAGE="https://vcvrack.com/"
 
@@ -13,6 +15,7 @@ OSDIALOG_COMMIT="015d020615e8169d2f227ad385c5f2aa1e091fd1"
 OUI_BLENDISH_COMMIT="b7066201022a757cbcbd986d8c91d565e4daef90"
 
 SRC_URI="https://github.com/vcvrack/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
+	https://github.com/vcvrack/Fundamental/archive/v${PV}.tar.gz -> Fundamental-${PV}.tar.gz
 	https://github.com/memononen/nanosvg/archive/${NANOSVG_COMMIT}.tar.gz -> nanosvg-${NANOSVG_COMMIT}.tar.gz
 	https://github.com/memononen/nanovg/archive/${NANOVG_COMMIT}.tar.gz -> nanovg-${NANOVG_COMMIT}.tar.gz
 	https://github.com/AndrewBelt/osdialog/archive/${OSDIALOG_COMMIT}.tar.gz -> osdialog-${OSDIALOG_COMMIT}.tar.gz
@@ -24,6 +27,7 @@ DEPEND="
 	dev-libs/openssl
 	media-libs/glew
 	media-libs/glfw
+	media-libs/libsamplerate
 	>=media-libs/rtaudio-5.0.0
 	media-libs/rtmidi
 	|| (
@@ -34,15 +38,13 @@ DEPEND="
 	sys-libs/zlib"
 RDEPEND="${DEPEND}"
 
-PATCHES="${FILESDIR}/0001-remove-system-provided-deps-for-packaging.patch
-	${FILESDIR}/0002-window-don-t-handle-pixel-scaling.patch
-	${FILESDIR}/0003-include-audio-fix-rtaudio-include-path.patch
-	${FILESDIR}/0004-Makefile-don-t-link-with-jack-fix-glfw-linkage.patch
-	${FILESDIR}/0005-asset-load-global-assets-from-usr-share-vcvrack.patch"
 
 src_unpack() {
 	unpack ${A}
 	mv -f Rack-${PV} ${S}
+
+	mkdir -p ${S}/plugins/Fundamental/
+	cp -r Fundamental-${PV}/* ${S}/plugins/Fundamental/
 
 	cp -r nanosvg-${NANOSVG_COMMIT}/* ${S}/dep/nanosvg/
 	cp -r nanovg-${NANOVG_COMMIT}/* ${S}/dep/nanovg/
@@ -51,18 +53,34 @@ src_unpack() {
 	mkdir ${S}/dep/include
 }
 
+src_prepare() {
+	epatch "${FILESDIR}/0001-remove-system-provided-deps-for-packaging.patch"
+	epatch "${FILESDIR}/0002-window-don-t-handle-pixel-scaling.patch"
+	epatch "${FILESDIR}/0003-include-audio-fix-rtaudio-include-path.patch"
+	epatch "${FILESDIR}/0004-Makefile-don-t-link-with-jack-fix-glfw-linkage.patch"
+	epatch "${FILESDIR}/0005-asset-load-global-assets-from-usr-share-vcvrack.patch"
+	epatch "${FILESDIR}/0006-plugin-load-plugins-from-global-resources-too.patch"
+
+	pushd ${S}/plugins/Fundamental/
+	epatch "${FILESDIR}/0001-remove-system-dependencies-from-build-process.patch"
+	popd
+
+	eapply_user
+}
+
 src_compile() {
 	BITS=64 ARCH=lin TARGET=rack emake
+	BITS=64 ARCH=lin TARGET=plugin.so emake -C plugins/Fundamental
 }
 
 src_install() {
 	dobin Rack
 
-	insinto /usr/include/rack
-	doins -r include/*
-
 	insinto /usr/share/vcvrack
 	doins -r res/
+
+	insinto /usr/share/vcvrack/plugins/Fundamental
+	doins plugins/Fundamental/plugin.so
 
 	einstalldocs
 }

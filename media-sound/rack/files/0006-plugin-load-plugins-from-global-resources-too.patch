@@ -1,0 +1,29 @@
+From b011a025c9e078432b74472103d4da13035871c2 Mon Sep 17 00:00:00 2001
+From: James Forcier <csssuf@csssuf.net>
+Date: Fri, 27 Apr 2018 21:21:42 -0700
+Subject: [PATCH 6/6] plugin: load plugins from global resources too
+
+---
+ src/plugin.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/plugin.cpp b/src/plugin.cpp
+index a977581..b8ca230 100644
+--- a/src/plugin.cpp
++++ b/src/plugin.cpp
+@@ -329,6 +329,12 @@ void pluginInit() {
+ 	init(corePlugin);
+ 	gPlugins.push_back(corePlugin);
+ 
++	// Load global plugins directory
++	std::string globalPlugins = assetGlobal("plugins");
++	if (systemIsDirectory(globalPlugins)) {
++		loadPlugins (globalPlugins);
++	}
++
+ 	// Get local plugins directory
+ 	std::string localPlugins = assetLocal("plugins");
+ 	mkdir(localPlugins.c_str(), 0755);
+-- 
+2.17.0
+
