@@ -52,12 +52,14 @@ src_unpack() {
 }
 
 src_compile() {
-	emake dep
 	BITS=64 ARCH=lin TARGET=rack emake
 }
 
 src_install() {
 	dobin Rack
+
+	insinto /usr/include/rack
+	doins -r include/*
 
 	insinto /usr/share/vcvrack
 	doins -r res/
